@@ -8,7 +8,12 @@ Status
 
 **Rough Translation Complete**
 
+ - hammer.go
  - hammer_btree.go
+
+**Translation Underway**
+
+ - hammer_vfsops.go
 
 Setup
 -----

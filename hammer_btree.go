@@ -51,10 +51,11 @@ import (
 	"bytes"
 	"encoding/binary"
 	"fmt"
+	"github.com/varialus/hammer/dependencies/library"
 	"github.com/varialus/hammer/dependencies/system"
 	"github.com/varialus/hammer/dependencies/system/kernel"
 	"github.com/varialus/hammer/dependencies/system/platform"
-	"github.com/varialus/hammer/dependencies/library"
+	"runtime"
 	"unsafe"
 )
 
@@ -2341,9 +2342,9 @@ func btree_search(cursor hammer_cursor_t, flags int) (result int) {
 //			KKASSERT(cursor->flags & HAMMER_CURSOR_BACKEND);
 			kernel.KKASSERT(cursor.flags & HAMMER_CURSOR_BACKEND)
 //			hammer_modify_node_field(cursor->trans, cursor->node,
-			hammer_modify_node_field(cursor.trans, cursor.node,
 //						 elms[0]);
-				"elms[0]")
+			/* Manually Expanded Macro */
+			hammer_modify_node(cursor.trans, cursor.node, &(cursor.node).ondisk.elms[0], int(unsafe.Sizeof((cursor.node).ondisk.elms[0])))
 //			save = node->elms[0].base.btype;
 			save = node.elms[0].base(0).btype
 //			node->elms[0].base = *cursor->left_bound;
@@ -2981,7 +2982,7 @@ func btree_split_internal(cursor hammer_cursor_t) int {
 //			hammer_delete_node(cursor->trans, parent);
 			hammer_delete_node(cursor.trans, parent)
 //			hammer_rel_node(parent);
-			hammer_rel_node(parent)
+			hammer_rel_node_one_arg(parent)
 //		}
 		}
 //		goto done;
@@ -3112,9 +3113,9 @@ func btree_split_internal(cursor hammer_cursor_t) int {
 //
 
 //		hammer_modify_volume_field(cursor->trans, volume,
-		hammer_modify_volume_field(cursor.trans, volume,
 //					   vol0_btree_root);
-			"vol0_btree_root")
+		/* Manually Expanded Macro */
+		hammer_modify_volume(cursor.trans, volume, &(volume).ondisk.vol0_btree_root, int(unsafe.Sizeof((volume).ondisk.vol0_btree_root)))
 //		volume->ondisk->vol0_btree_root = parent->node_offset;
 		volume.ondisk.vol0_btree_root = parent.node_offset
 //		hammer_modify_volume_done(volume);
@@ -3126,7 +3127,7 @@ func btree_split_internal(cursor hammer_cursor_t) int {
 //			hammer_unlock(&cursor->parent->lock);
 			hammer_unlock(&cursor.parent.lock)
 //			hammer_rel_node(cursor->parent);
-			hammer_rel_node(cursor.parent)
+			hammer_rel_node_one_arg(cursor.parent)
 //		}
 		}
 //		cursor->parent = parent;	/* lock'd and ref'd */
@@ -3161,7 +3162,7 @@ func btree_split_internal(cursor hammer_cursor_t) int {
 //		hammer_unlock(&cursor->node->lock);
 		hammer_unlock(&cursor.node.lock)
 //		hammer_rel_node(cursor->node);
-		hammer_rel_node(cursor.node)
+		hammer_rel_node_one_arg(cursor.node)
 //		cursor->node = new_node;	/* locked and ref'd */
 		cursor.node = new_node;	/* locked and ref'd */
 //	} else {
@@ -3171,7 +3172,7 @@ func btree_split_internal(cursor hammer_cursor_t) int {
 //		hammer_unlock(&new_node->lock);
 		hammer_unlock(&new_node.lock)
 //		hammer_rel_node(new_node);
-		hammer_rel_node(new_node)
+		hammer_rel_node_one_arg(new_node)
 //	}
 	}
 //
@@ -3415,7 +3416,7 @@ func btree_split_leaf(cursor hammer_cursor_t) int {
 //			hammer_delete_node(cursor->trans, parent);
 			hammer_delete_node(cursor.trans, parent)
 //			hammer_rel_node(parent);
-			hammer_rel_node(parent)
+			hammer_rel_node_one_arg(parent)
 //		}
 		}
 //		goto done;
@@ -3526,9 +3527,9 @@ func btree_split_leaf(cursor hammer_cursor_t) int {
 //
 
 //		hammer_modify_volume_field(cursor->trans, volume,
-		hammer_modify_volume_field(cursor.trans, volume,
 //					   vol0_btree_root);
-			"vol0_btree_root")
+		/* Manually Expanded Macro */
+		hammer_modify_volume(cursor.trans, volume, &(volume).ondisk.vol0_btree_root, int(unsafe.Sizeof((volume).ondisk.vol0_btree_root)))
 //		volume->ondisk->vol0_btree_root = parent->node_offset;
 		volume.ondisk.vol0_btree_root = parent.node_offset
 //		hammer_modify_volume_done(volume);
@@ -3540,7 +3541,7 @@ func btree_split_leaf(cursor hammer_cursor_t) int {
 //			hammer_unlock(&cursor->parent->lock);
 			hammer_unlock(&cursor.parent.lock)
 //			hammer_rel_node(cursor->parent);
-			hammer_rel_node(cursor.parent)
+			hammer_rel_node_one_arg(cursor.parent)
 //		}
 		}
 //		cursor->parent = parent;	/* lock'd and ref'd */
@@ -3576,7 +3577,7 @@ func btree_split_leaf(cursor hammer_cursor_t) int {
 //		hammer_unlock(&cursor->node->lock);
 		hammer_unlock(&cursor.node.lock)
 //		hammer_rel_node(cursor->node);
-		hammer_rel_node(cursor.node)
+		hammer_rel_node_one_arg(cursor.node)
 //		cursor->node = new_leaf;
 		cursor.node = new_leaf
 //	} else {
@@ -3586,7 +3587,7 @@ func btree_split_leaf(cursor hammer_cursor_t) int {
 //		hammer_unlock(&new_leaf->lock);
 		hammer_unlock(&new_leaf.lock)
 //		hammer_rel_node(new_leaf);
-		hammer_rel_node(new_leaf)
+		hammer_rel_node_one_arg(new_leaf)
 //	}
 	}
 //
@@ -4014,7 +4015,7 @@ func btree_remove(cursor hammer_cursor_t) int {
 //			hammer_unlock(&node->lock);
 			hammer_unlock(&node.lock)
 //			hammer_rel_node(node);
-			hammer_rel_node(node)
+			hammer_rel_node_one_arg(node)
 //		} else {
 		} else {
 			/*
@@ -4312,7 +4313,8 @@ func hammer_btree_mirror_propagate(cursor hammer_cursor_t, mirror_tid hammer_tid
 			return 0
 		}
 //		hammer_modify_node_field(cursor->trans, node, mirror_tid);
-		hammer_modify_node_field(cursor.trans, node, mirror_tid)
+		/* Manually Expanded Macro */
+		hammer_modify_node(cursor.trans, node, &(node).ondisk.mirror_tid, int(unsafe.Sizeof((node).ondisk.mirror_tid)))
 //		node->ondisk->mirror_tid = mirror_tid;
 		node.ondisk.mirror_tid = mirror_tid
 //		hammer_modify_node_done(node);
@@ -4380,7 +4382,7 @@ func hammer_btree_get_parent(trans hammer_transaction_t, node hammer_node_t,
 //		if (hammer_lock_ex_try(&parent->lock)) {
 		if hammer_lock_ex_try(&parent.lock) != 0 {
 //			hammer_rel_node(parent);
-			hammer_rel_node(parent)
+			hammer_rel_node_one_arg(parent)
 //			*errorp = EDEADLK;
 			*errorp = system.EDEADLK
 //			return(NULL);
@@ -4479,13 +4481,14 @@ func btree_set_parent(trans hammer_transaction_t, node hammer_node_t,
 //		if (error == 0) {
 		if error == 0 {
 //			hammer_modify_node_field(trans, child, parent);
-			hammer_modify_node_field(trans, child, "parent")
+			/* Manually Expanded Macro */
+			hammer_modify_node(trans, child, &(child).ondisk.parent, int(unsafe.Sizeof((child).ondisk.parent)))
 //			child->ondisk->parent = node->node_offset;
 			child.ondisk.parent = node.node_offset
 //			hammer_modify_node_done(child);
 			hammer_modify_node_done(child)
 //			hammer_rel_node(child);
-			hammer_rel_node(child)
+			hammer_rel_node_one_arg(child)
 //		}
 		}
 //		break;
@@ -4510,7 +4513,52 @@ func btree_set_parent(trans hammer_transaction_t, node hammer_node_t,
 //{
 func hammer_node_lock_init(parent hammer_node_lock_t, node hammer_node_t) {
 //	TAILQ_INIT(&parent->list);
-	system.TAILQ_INIT(&parent.list)
+	/* Manually Expanded Macro */
+	/* First Expansion */
+	//do {
+	//	TAILQ_FIRST((&parent->list)) = NULL;
+	//	(&parent->list)->tqh_last = &TAILQ_FIRST((&parent->list));
+	//	QMD_TRACE_HEAD(&parent->list);
+	//} while (0)
+	/* Second Expansion */
+	//do {
+	//	TAILQ_FIRST((&parent->list)) = NULL;
+	//	(&parent->list)->tqh_last = &TAILQ_FIRST((&parent->list));
+		//do {
+		//	(&parent->list)->trace.prevline = (&parent->list)->trace.lastline;
+		//	(&parent->list)->trace.prevfile = (&parent->list)->trace.lastfile;
+		//	(&parent->list)->trace.lastline = __LINE__;
+		//	(&parent->list)->trace.lastfile = __FILE__;
+		//} while (0)
+	//} while (0)
+	/* Third Expansion */
+	//do {
+	//	(((&parent->list))->tqh_first) = NULL;
+	//	(&parent->list)->tqh_last = &TAILQ_FIRST((&parent->list));
+		//do {
+		//	(&parent->list)->trace.prevline = (&parent->list)->trace.lastline;
+		//	(&parent->list)->trace.prevfile = (&parent->list)->trace.lastfile;
+		//	(&parent->list)->trace.lastline = __LINE__;
+		//	(&parent->list)->trace.lastfile = __FILE__;
+		//} while (0)
+	//} while (0)
+	/* Fourth Expansion and Translation */
+	//do {
+	//	(((&parent->list))->tqh_first) = NULL;
+	(((&parent.list)).tqh_first) = nil
+	//	(&parent->list)->tqh_last = &(((&parent->list))->tqh_first);
+	(&parent.list).tqh_last = &(((&parent.list)).tqh_first);
+		//do {
+		//	(&parent->list)->trace.prevline = (&parent->list)->trace.lastline;
+	(&parent.list).trace.Prevline = (&parent.list).trace.Lastline;
+		//	(&parent->list)->trace.prevfile = (&parent->list)->trace.lastfile;
+	(&parent.list).trace.Prevfile = (&parent.list).trace.Lastfile;
+		//	(&parent->list)->trace.lastline = __LINE__;
+	_, _, (&parent.list).trace.Lastline, _ = runtime.Caller(0)
+		//	(&parent->list)->trace.lastfile = __FILE__;
+	_, (&parent.list).trace.Lastfile, _, _ = runtime.Caller(0)
+		//} while (0)
+	//} while (0)
 //	parent->parent = NULL;
 	parent.parent = nil
 //	parent->node = node;
@@ -4558,7 +4606,23 @@ func hammer_btree_lcache_init(hmp hammer_mount_t, lcache hammer_node_lock_t, dep
 //	bzero(lcache, sizeof(*lcache));
 	library.Bzero(lcache, unsafe.Sizeof(lcache))
 //	TAILQ_INIT(&lcache->list);
-	system.TAILQ_INIT(&lcache.list)
+	/* Manually Expanded Macro */
+	//do {
+	//	(((&lcache->list))->tqh_first) = NULL;
+	(((&lcache.list)).tqh_first) = nil
+	//	(&lcache->list)->tqh_last = &(((&lcache->list))->tqh_first);
+	(&lcache.list).tqh_last = &(((&lcache.list)).tqh_first);
+		//do {
+		//	(&lcache->list)->trace.prevline = (&lcache->list)->trace.lastline;
+	(&lcache.list).trace.Prevline = (&lcache.list).trace.Lastline;
+		//	(&lcache->list)->trace.prevfile = (&lcache->list)->trace.lastfile;
+	(&lcache.list).trace.Prevfile = (&lcache.list).trace.Lastfile;
+		//	(&lcache->list)->trace.lastline = __LINE__;
+	_, _, (&lcache.list).trace.Lastline, _ = runtime.Caller(0)
+		//	(&lcache->list)->trace.lastfile = __FILE__;
+	_, (&lcache.list).trace.Lastfile, _, _ = runtime.Caller(0)
+		//} while (0)
+	//} while (0)
 //	while (count) {
 	for ; count != 0; {
 //		item = kmalloc(sizeof(*item), hmp->m_misc, M_WAITOK|M_ZERO);
@@ -4568,9 +4632,133 @@ func hammer_btree_lcache_init(hmp hammer_mount_t, lcache hammer_node_lock_t, dep
 		item.copy = new(hammer_node_ondisk)
 
 //		TAILQ_INIT(&item->list);
-		system.TAILQ_INIT(&item.list)
-//		TAILQ_INSERT_TAIL(&lcache->list, item, entry);
-		system.TAILQ_INSERT_TAIL(&lcache.list, item, "entry")
+		/* Manually Expanded Macro */
+		//do {
+		//	(((&item->list))->tqh_first) = NULL;
+		(((&item.list)).tqh_first) = nil
+		//	(&item->list)->tqh_last = &(((&item->list))->tqh_first);
+		(&item.list).tqh_last = &(((&item.list)).tqh_first);
+			//do {
+			//	(&item->list)->trace.prevline = (&item->list)->trace.lastline;
+		(&item.list).trace.Prevline = (&item.list).trace.Lastline;
+			//	(&item->list)->trace.prevfile = (&item->list)->trace.lastfile;
+		(&item.list).trace.Prevfile = (&item.list).trace.Lastfile;
+			//	(&item->list)->trace.lastline = __LINE__;
+		_, _, (&item.list).trace.Lastline, _ = runtime.Caller(0)
+			//	(&item->list)->trace.lastfile = __FILE__;
+		_, (&item.list).trace.Lastfile, _, _ = runtime.Caller(0)
+			//} while (0)
+		//} while (0)
+//		TAILQ_INSERT_TAIL(&item->list, item, entry);
+		/* Manually Expanded Macro */
+		/* First Expansion */
+		//do {
+		//	QMD_TAILQ_CHECK_TAIL(&item->list, entry);
+		//	TAILQ_NEXT((item), entry) = NULL;
+		//	(item)->entry.tqe_prev = (&item->list)->tqh_last;
+		//	*(&item->list)->tqh_last = (item);
+		//	(&item->list)->tqh_last = &TAILQ_NEXT((item), entry);
+		//	QMD_TRACE_HEAD(&item->list);
+		//	QMD_TRACE_ELEM(&(item)->entry);
+		//} while (0)
+		/* Second Expansion */
+		//do {
+			//do {
+			//	if (*(&item->list)->tqh_last != NULL)
+			//		panic("Bad tailq NEXT(%p->tqh_last) != NULL", (&item->list));
+			//} while (0)
+		//	TAILQ_NEXT((item), entry) = NULL;
+		//	(item)->entry.tqe_prev = (&item->list)->tqh_last;
+		//	*(&item->list)->tqh_last = (item);
+		//	(&item->list)->tqh_last = &TAILQ_NEXT((item), entry);
+		//	QMD_TRACE_HEAD(&item->list);
+		//	QMD_TRACE_ELEM(&(item)->entry);
+		//} while (0)
+		/* Third Expansion */
+		//do {
+			//do {
+			//	if (*(&item->list)->tqh_last != NULL)
+			//		panic("Bad tailq NEXT(%p->tqh_last) != NULL", (&item->list));
+			//} while (0)
+		//	(((item))->entry.tqe_next) = NULL;
+		//	(item)->entry.tqe_prev = (&item->list)->tqh_last;
+		//	*(&item->list)->tqh_last = (item);
+		//	(&item->list)->tqh_last = &TAILQ_NEXT((item), entry);
+		//	QMD_TRACE_HEAD(&item->list);
+		//	QMD_TRACE_ELEM(&(item)->entry);
+		//} while (0)
+		/* Fourth Expansion */
+		//do {
+			//do {
+			//	if (*(&item->list)->tqh_last != NULL)
+			//		panic("Bad tailq NEXT(%p->tqh_last) != NULL", (&item->list));
+			//} while (0)
+		//	(((item))->entry.tqe_next) = NULL;
+		//	(item)->entry.tqe_prev = (&item->list)->tqh_last;
+		//	*(&item->list)->tqh_last = (item);
+		//	(&item->list)->tqh_last = &TAILQ_NEXT((item), entry);
+			//do {					\
+			//	(&item->list)->trace.prevline = (&item->list)->trace.lastline;		\
+			//	(&item->list)->trace.prevfile = (&item->list)->trace.lastfile;		\
+			//	(&item->list)->trace.lastline = __LINE__;				\
+			//	(&item->list)->trace.lastfile = __FILE__;				\
+			//} while (0)
+		//	QMD_TRACE_ELEM(&(item)->entry);
+		//} while (0)
+		/* Fifth Expansion */
+		//do {
+			//do {
+			//	if (*(&item->list)->tqh_last != NULL)
+			//		panic("Bad tailq NEXT(%p->tqh_last) != NULL", (&item->list));
+			//} while (0)
+		//	(((item))->entry.tqe_next) = NULL;
+		//	(item)->entry.tqe_prev = (&item->list)->tqh_last;
+		//	*(&item->list)->tqh_last = (item);
+		//	(&item->list)->tqh_last = &(((item))->entry.tqe_next);
+			//do {					\
+			//	(&item->list)->trace.prevline = (&item->list)->trace.lastline;		\
+			//	(&item->list)->trace.prevfile = (&item->list)->trace.lastfile;		\
+			//	(&item->list)->trace.lastline = __LINE__;				\
+			//	(&item->list)->trace.lastfile = __FILE__;				\
+			//} while (0)
+		//	QMD_TRACE_ELEM(&(item)->entry);
+		//} while (0)
+		/* Sixth Expansion and Translation*/
+		//do {
+			//do {
+			//	if (*(&item->list)->tqh_last != NULL)
+		if *(&item.list).tqh_last != nil {
+			//		panic("Bad tailq NEXT(%p->tqh_last) != NULL", (&item->list));
+			panic(fmt.Sprintf("Bad tailq NEXT(%p.tqh_last) != nil", (&item.list)))
+		}
+			//} while (0)
+		//	(((item))->entry.tqe_next) = NULL;
+		(((item)).entry.tqe_next) = nil
+		//	(item)->entry.tqe_prev = (&item->list)->tqh_last;
+		(item).entry.tqe_prev = (&item.list).tqh_last
+		//	*(&item->list)->tqh_last = (item);
+		*(&item.list).tqh_last = (item)
+		//	(&item->list)->tqh_last = &(((item))->entry.tqe_next);
+		(&item.list).tqh_last = &(((item)).entry.tqe_next)
+			//do {
+			//	(&item->list)->trace.prevline = (&item->list)->trace.lastline;
+		(&item.list).trace.Prevline = (&item.list).trace.Lastline
+			//	(&item->list)->trace.prevfile = (&item->list)->trace.lastfile;
+		(&item.list).trace.Prevfile = (&item.list).trace.Lastfile
+			//	(&item->list)->trace.lastline = __LINE__;
+			//	(&item->list)->trace.lastfile = __FILE__;
+		_, (&item.list).trace.Lastfile, (&item.list).trace.Lastline, _ = runtime.Caller(0)
+			//} while (0)
+			//do {
+			//	(&(item)->entry)->trace.prevline = (&(item)->entry)->trace.lastline;
+		(&(item).entry).trace.Prevline = (&(item).entry).trace.Lastline
+			//	(&(item)->entry)->trace.prevfile = (&(item)->entry)->trace.lastfile;
+		(&(item).entry).trace.Prevfile = (&(item).entry).trace.Lastfile
+			//	(&(item)->entry)->trace.lastline = __LINE__;
+			//	(&(item)->entry)->trace.lastfile = __FILE__;
+		_, (&(item).entry).trace.Lastfile, (&(item).entry).trace.Lastline, _ = runtime.Caller(0)
+			//} while (0)
+		//} while (0)
 //		--count;
 		count--
 //	}
@@ -4591,11 +4779,11 @@ func hammer_btree_lcache_free(hmp hammer_mount_t, lcache hammer_node_lock_t) {
 //	while ((item = TAILQ_FIRST(&lcache->list)) != NULL) {
 	for ;item != empty_hammer_node_lock_t /*NULL*/; {
 //		TAILQ_REMOVE(&lcache->list, item, entry);
-		system.TAILQ_REMOVE(&lcache.list, item, "entry")
+		// TODO: Manually expand macro defined in hammer/dependencies/system/queue.go
 //		KKASSERT(item->copy);
 		kernel.KKASSERT(item.copy)
 //		KKASSERT(TAILQ_EMPTY(&item->list));
-		kernel.KKASSERT(system.TAILQ_EMPTY(&item.list))
+		// TODO: Manually expand macro defined in hammer/dependencies/system/queue.go
 //		kfree(item->copy, hmp->m_misc);
 		item.copy = nil
 		hmp.m_misc = nil
@@ -4688,7 +4876,7 @@ func hammer_btree_lock_children(cursor hammer_cursor_t, depth int, parent hammer
 //		if (child)
 		if child != empty_hammer_node_t {
 //			hammer_rel_node(child);
-			hammer_rel_node(child)
+			hammer_rel_node_one_arg(child)
 		}
 //	}
 	}
@@ -4744,7 +4932,7 @@ func hammer_btree_lock_children(cursor hammer_cursor_t, depth int, parent hammer
 //				error = EDEADLK;
 				error = system.EDEADLK
 //				hammer_rel_node(child);
-				hammer_rel_node(child)
+				hammer_rel_node_one_arg(child)
 //			} else {
 			} else {
 //				if (lcache) {
@@ -4756,9 +4944,8 @@ func hammer_btree_lock_children(cursor hammer_cursor_t, depth int, parent hammer
 //					item->flags |= HAMMER_NODE_LOCK_LCACHE;
 					item.flags |= HAMMER_NODE_LOCK_LCACHE
 //					TAILQ_REMOVE(&lcache->list,
-					system.TAILQ_REMOVE(&lcache.list,
 //						     item, entry);
-						     item, "entry")
+					// TODO: Manually expand macro defined in hammer/dependencies/system/queue.go
 //				} else {
 				} else {
 //					item = kmalloc(sizeof(*item),
@@ -4766,13 +4953,65 @@ func hammer_btree_lock_children(cursor hammer_cursor_t, depth int, parent hammer
 //						       M_WAITOK|M_ZERO);
 					item = new(hammer_node_lock)
 //					TAILQ_INIT(&item->list);
-					system.TAILQ_INIT(&item.list)
+					/* Manually Expanded Macro */
+					//do {
+					//	(((&item->list))->tqh_first) = NULL;
+					(((&item.list)).tqh_first) = nil
+					//	(&item->list)->tqh_last = &(((&item->list))->tqh_first);
+					(&item.list).tqh_last = &(((&item.list)).tqh_first);
+						//do {
+						//	(&item->list)->trace.prevline = (&item->list)->trace.lastline;
+					(&item.list).trace.Prevline = (&item.list).trace.Lastline;
+						//	(&item->list)->trace.prevfile = (&item->list)->trace.lastfile;
+					(&item.list).trace.Prevfile = (&item.list).trace.Lastfile;
+						//	(&item->list)->trace.lastline = __LINE__;
+					_, _, (&item.list).trace.Lastline, _ = runtime.Caller(0)
+						//	(&item->list)->trace.lastfile = __FILE__;
+					_, (&item.list).trace.Lastfile, _, _ = runtime.Caller(0)
+						//} while (0)
+					//} while (0)
 //				}
 				}
 //
 
 //				TAILQ_INSERT_TAIL(&parent->list, item, entry);
-				system.TAILQ_INSERT_TAIL(&parent.list, item, "entry")
+				/* Manually Expanded Macro */
+				/* Sixth Expansion and Translation*/
+				//do {
+					//do {
+					//	if (*(&parent->list)->tqh_last != NULL)
+				if *(&parent.list).tqh_last != nil {
+					//		panic("Bad tailq NEXT(%p->tqh_last) != NULL", (&parent->list));
+					panic(fmt.Sprintf("Bad tailq NEXT(%p.tqh_last) != nil", (&parent.list)))
+				}
+					//} while (0)
+				//	(((item))->entry.tqe_next) = NULL;
+				(((item)).entry.tqe_next) = nil
+				//	(item)->entry.tqe_prev = (&parent->list)->tqh_last;
+				(item).entry.tqe_prev = (&parent.list).tqh_last
+				//	*(&parent->list)->tqh_last = (item);
+				*(&parent.list).tqh_last = (item)
+				//	(&parent->list)->tqh_last = &(((item))->entry.tqe_next);
+				(&parent.list).tqh_last = &(((item)).entry.tqe_next)
+					//do {
+					//	(&parent->list)->trace.prevline = (&parent->list)->trace.lastline;
+				(&parent.list).trace.Prevline = (&parent.list).trace.Lastline
+					//	(&parent->list)->trace.prevfile = (&parent->list)->trace.lastfile;
+				(&parent.list).trace.Prevfile = (&parent.list).trace.Lastfile
+					//	(&parent->list)->trace.lastline = __LINE__;
+					//	(&parent->list)->trace.lastfile = __FILE__;
+				_, (&parent.list).trace.Lastfile, (&parent.list).trace.Lastline, _ = runtime.Caller(0)
+					//} while (0)
+					//do {
+					//	(&(item)->entry)->trace.prevline = (&(item)->entry)->trace.lastline;
+				(&(item).entry).trace.Prevline = (&(item).entry).trace.Lastline
+					//	(&(item)->entry)->trace.prevfile = (&(item)->entry)->trace.lastfile;
+				(&(item).entry).trace.Prevfile = (&(item).entry).trace.Lastfile
+					//	(&(item)->entry)->trace.lastline = __LINE__;
+					//	(&(item)->entry)->trace.lastfile = __FILE__;
+				_, (&(item).entry).trace.Lastfile, (&(item).entry).trace.Lastline, _ = runtime.Caller(0)
+					//} while (0)
+				//} while (0)
 //				item->parent = parent;
 				item.parent = parent
 //				item->node = child;
@@ -4828,7 +5067,8 @@ func hammer_btree_lock_copy(cursor hammer_cursor_t, parent hammer_node_lock_t) {
 //	hammer_mount_t hmp = cursor->trans->hmp;
 	//hmp := cursor.trans.hmp
 //	hammer_node_lock_t item;
-	var item hammer_node_lock_t
+	/* Used in Macro Expansion Below */
+	//var item hammer_node_lock_t
 //
 
 //	if (parent->copy == NULL) {
@@ -4847,7 +5087,7 @@ func hammer_btree_lock_copy(cursor hammer_cursor_t, parent hammer_node_lock_t) {
 //	TAILQ_FOREACH(item, &parent->list, entry) {
 //		hammer_btree_lock_copy(cursor, item);
 //	}
-	system.TAILQ_FOREACH(item, &parent.list, "entry", hammer_btree_lock_copy, cursor, item)
+	// TODO: Manually expand macro defined in hammer/dependencies/system/queue.go
 //}
 }
 //
@@ -4860,7 +5100,8 @@ func hammer_btree_lock_copy(cursor hammer_cursor_t, parent hammer_node_lock_t) {
 //{
 func hammer_btree_sync_copy(cursor hammer_cursor_t, parent hammer_node_lock_t) int {
 //	hammer_node_lock_t item;
-	var item hammer_node_lock_t
+	/* Used in Macro Expansion Below */
+	//var item hammer_node_lock_t
 //	int count = 0;
 	count := 0
 //
@@ -4888,7 +5129,7 @@ func hammer_btree_sync_copy(cursor hammer_cursor_t, parent hammer_node_lock_t) i
 //	TAILQ_FOREACH(item, &parent->list, entry) {
 //		count += hammer_btree_sync_copy(cursor, item);
 //	}
-	system.TAILQ_FOREACH(item, &parent.list, "entry", func() {count += hammer_btree_sync_copy(cursor, item)})
+	// TODO: Manually expand macro defined in hammer/dependencies/system/queue.go
 //	return(count);
 	return count
 //}
@@ -4920,13 +5161,13 @@ func hammer_btree_unlock_children(hmp hammer_mount_t, parent hammer_node_lock_t,
 //	while ((item = TAILQ_FIRST(&parent->list)) != NULL) {
 	for ; item != nil; {
 //		TAILQ_REMOVE(&parent->list, item, entry);
-		system.TAILQ_REMOVE(&parent.list, item, "entry")
+		// TODO: Manually expand macro defined in hammer/dependencies/system/queue.go
 //		hammer_btree_unlock_children(hmp, item, lcache);
 		hammer_btree_unlock_children(hmp, item, lcache)
 //		hammer_unlock(&item->node->lock);
 		hammer_unlock(&item.node.lock)
 //		hammer_rel_node(item->node);
-		hammer_rel_node(item.node)
+		hammer_rel_node_one_arg(item.node)
 //		if (lcache) {
 		if lcache != empty_hammer_node_lock_t {
 			/*
@@ -4938,13 +5179,29 @@ func hammer_btree_unlock_children(hmp hammer_mount_t, parent hammer_node_lock_t,
 //			KKASSERT(item->flags & HAMMER_NODE_LOCK_LCACHE);
 			kernel.KKASSERT(item.flags & HAMMER_NODE_LOCK_LCACHE)
 //			KKASSERT(TAILQ_EMPTY(&item->list));
-			kernel.KKASSERT(system.TAILQ_EMPTY(&item.list))
+			// TODO: Manually expand macro defined in hammer/dependencies/system/queue.go
 //			copy = item->copy;
 			copy = item.copy
 //			bzero(item, sizeof(*item));
 			library.Bzero(item, unsafe.Sizeof(item))
 //			TAILQ_INIT(&item->list);
-			system.TAILQ_INIT(&item.list)
+			/* Manually Expanded Macro */
+			//do {
+			//	(((&item->list))->tqh_first) = NULL;
+			(((&item.list)).tqh_first) = nil
+			//	(&item->list)->tqh_last = &(((&item->list))->tqh_first);
+			(&item.list).tqh_last = &(((&item.list)).tqh_first);
+				//do {
+				//	(&item->list)->trace.prevline = (&item->list)->trace.lastline;
+			(&item.list).trace.Prevline = (&item.list).trace.Lastline;
+				//	(&item->list)->trace.prevfile = (&item->list)->trace.lastfile;
+			(&item.list).trace.Prevfile = (&item.list).trace.Lastfile;
+				//	(&item->list)->trace.lastline = __LINE__;
+			_, _, (&item.list).trace.Lastline, _ = runtime.Caller(0)
+				//	(&item->list)->trace.lastfile = __FILE__;
+			_, (&item.list).trace.Lastfile, _, _ = runtime.Caller(0)
+				//} while (0)
+			//} while (0)
 //			item->copy = copy;
 			item.copy = copy
 //			if (copy)
@@ -4953,7 +5210,43 @@ func hammer_btree_unlock_children(hmp hammer_mount_t, parent hammer_node_lock_t,
 				library.Bzero(copy, unsafe.Sizeof(copy))
 			}
 //			TAILQ_INSERT_TAIL(&lcache->list, item, entry);
-			system.TAILQ_INSERT_TAIL(&lcache.list, item, "entry")
+			/* Manually Expanded Macro */
+			/* Sixth Expansion and Translation*/
+			//do {
+				//do {
+				//	if (*(&lcache->list)->tqh_last != NULL)
+			if *(&lcache.list).tqh_last != nil {
+				//		panic("Bad tailq NEXT(%p->tqh_last) != NULL", (&lcache->list));
+				panic(fmt.Sprintf("Bad tailq NEXT(%p.tqh_last) != nil", (&lcache.list)))
+			}
+				//} while (0)
+			//	(((item))->entry.tqe_next) = NULL;
+			(((item)).entry.tqe_next) = nil
+			//	(item)->entry.tqe_prev = (&lcache->list)->tqh_last;
+			(item).entry.tqe_prev = (&lcache.list).tqh_last
+			//	*(&lcache->list)->tqh_last = (item);
+			*(&lcache.list).tqh_last = (item)
+			//	(&lcache->list)->tqh_last = &(((item))->entry.tqe_next);
+			(&lcache.list).tqh_last = &(((item)).entry.tqe_next)
+				//do {
+				//	(&lcache->list)->trace.prevline = (&lcache->list)->trace.lastline;
+			(&lcache.list).trace.Prevline = (&lcache.list).trace.Lastline
+				//	(&lcache->list)->trace.prevfile = (&lcache->list)->trace.lastfile;
+			(&lcache.list).trace.Prevfile = (&lcache.list).trace.Lastfile
+				//	(&lcache->list)->trace.lastline = __LINE__;
+				//	(&lcache->list)->trace.lastfile = __FILE__;
+			_, (&lcache.list).trace.Lastfile, (&lcache.list).trace.Lastline, _ = runtime.Caller(0)
+				//} while (0)
+				//do {
+				//	(&(item)->entry)->trace.prevline = (&(item)->entry)->trace.lastline;
+			(&(item).entry).trace.Prevline = (&(item).entry).trace.Lastline
+				//	(&(item)->entry)->trace.prevfile = (&(item)->entry)->trace.lastfile;
+			(&(item).entry).trace.Prevfile = (&(item).entry).trace.Lastfile
+				//	(&(item)->entry)->trace.lastline = __LINE__;
+				//	(&(item)->entry)->trace.lastfile = __FILE__;
+			_, (&(item).entry).trace.Lastfile, (&(item).entry).trace.Lastline, _ = runtime.Caller(0)
+				//} while (0)
+			//} while (0)
 //		} else {
 		} else {
 //			kfree(item, hmp->m_misc);

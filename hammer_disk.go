@@ -181,6 +181,7 @@ const HAMMER_ZONE_LARGE_DATA			= 0xA000000000000000
 //#define HAMMER_ZONE_UNAVAIL_INDEX	15	/* unavailable */
 //
 //#define HAMMER_MAX_ZONES		16
+const	HAMMER_MAX_ZONES		= 16
 //
 //#define HAMMER_VOL_ENCODE(vol_no)			\
 //	((hammer_off_t)((vol_no) & 255) << 52)
@@ -259,6 +260,7 @@ const HAMMER_ZONE_LARGE_DATA			= 0xA000000000000000
 // *		a zone-2 address.
 // */
 //struct hammer_blockmap {
+type hammer_blockmap struct {
 //	hammer_off_t	phys_offset;    /* zone-2 physical offset */
 //	hammer_off_t	first_offset;	/* zone-X logical offset (zone 3) */
 //	hammer_off_t	next_offset;	/* zone-X logical offset */
@@ -266,6 +268,7 @@ const HAMMER_ZONE_LARGE_DATA			= 0xA000000000000000
 //	u_int32_t	reserved01;
 //	hammer_crc_t	entry_crc;
 //};
+}
 //
 //typedef struct hammer_blockmap *hammer_blockmap_t;
 //
@@ -730,6 +733,7 @@ const HAMMER_RECTYPE_DB			= 0x0012
 // * new record.
 // */
 //struct hammer_inode_data {
+type hammer_inode_data struct {
 //	u_int16_t version;	/* inode data version */
 //	u_int16_t mode;		/* basic unix permissions */
 //	u_int32_t uflags;	/* chflags */
@@ -742,6 +746,7 @@ const HAMMER_RECTYPE_DB			= 0x0012
 //
 //	u_int8_t  obj_type;
 //	u_int8_t  cap_flags;	/* capability support flags (extension) */
+	cap_flags	uint8	/* capability support flags (extension) */
 //	u_int16_t reserved02;
 //	u_int32_t reserved03;	/* RESERVED FOR POSSIBLE FUTURE BIRTHTIME */
 //	u_int64_t nlinks;	/* hard links */
@@ -757,6 +762,7 @@ const HAMMER_RECTYPE_DB			= 0x0012
 //	u_int64_t mtime;	/* mtime must be second-to-last */
 //	u_int64_t atime;	/* atime must be last */
 //};
+}
 //
 ///*
 // * Neither mtime nor atime upates are CRCd by the B-Tree element.
@@ -783,6 +789,7 @@ const HAMMER_RECTYPE_DB			= 0x0012
 //#define HAMMER_INODE_CAP_DIRHASH_ALG2	0x02
 //#define HAMMER_INODE_CAP_DIRHASH_ALG3	0x03
 //#define HAMMER_INODE_CAP_DIR_LOCAL_INO	0x04	/* use inode localization */
+const HAMMER_INODE_CAP_DIR_LOCAL_INO		= 0x04
 //
 ///*
 // * A HAMMER directory entry associates a HAMMER filesystem object with a
@@ -845,6 +852,7 @@ const HAMMER_RECTYPE_DB			= 0x0012
 // * able to mirror to/from newer 64-bit systems (using the packed structure).
 // */
 //struct hammer_pseudofs_data {
+type hammer_pseudofs_data struct {
 //	hammer_tid_t	sync_low_tid;	/* full history beyond this point */
 //	hammer_tid_t	sync_beg_tid;	/* earliest tid w/ full history avail */
 //	hammer_tid_t	sync_end_tid;	/* current synchronizatoin point */
@@ -865,6 +873,7 @@ const HAMMER_RECTYPE_DB			= 0x0012
 //	int32_t		prune_max;	/* do not retain history beyond here */
 //	int32_t		reserved[16];
 //} __packed;
+}
 //
 //typedef struct hammer_pseudofs_data *hammer_pseudofs_data_t;
 //
@@ -905,6 +914,7 @@ const HAMMER_RECTYPE_DB			= 0x0012
 // * Rollup various structures embedded as record data
 // */
 //union hammer_data_ondisk {
+type hammer_data_ondisk []byte
 //	struct hammer_entry_data entry;
 //	struct hammer_inode_data inode;
 //	struct hammer_symlink_data symlink;

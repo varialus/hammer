@@ -110,11 +110,17 @@ package system
 //#ifdef QUEUE_MACRO_DEBUG
 ///* Store the last 2 places the queue element or head was altered */
 //struct qm_trace {
+type Qm_trace struct {
 //	char	*lastfile;
+	Lastfile	string
 //	int	 lastline;
+	Lastline	int
 //	char	*prevfile;
+	Prevfile	string
 //	int	 prevline;
+	Prevline	int
 //};
+};
 //
 //#define	TRACEBUF	struct qm_trace trace;
 //#define	TRASHIT(x)	do {(x) = (void *)-1;} while (0)
@@ -521,22 +527,13 @@ package system
 //} while (0)
 //
 //#define	TAILQ_EMPTY(head)	((head)->tqh_first == NULL)
-func TAILQ_EMPTY(interface{}) interface{} {
-	var return_value interface{}
-	return return_value
-}
 //
 //#define	TAILQ_FIRST(head)	((head)->tqh_first)
-func TAILQ_FIRST(interface{}) interface{} {
-	var return_value interface{}
-	return return_value
-}
 //
 //#define	TAILQ_FOREACH(var, head, field)					\
 //	for ((var) = TAILQ_FIRST((head));				\
 //	    (var);							\
 //	    (var) = TAILQ_NEXT((var), field))
-func TAILQ_FOREACH(...interface{}) {}
 //
 //#define	TAILQ_FOREACH_MUTABLE(var, head, field, tvar)			\
 //	for ((var) = TAILQ_FIRST((head));				\
@@ -558,7 +555,6 @@ func TAILQ_FOREACH(...interface{}) {}
 //	(head)->tqh_last = &TAILQ_FIRST((head));			\
 //	QMD_TRACE_HEAD(head);						\
 //} while (0)
-func TAILQ_INIT(interface{}) {}
 //
 //#define	TAILQ_INSERT_AFTER(head, listelm, elm, field) do {		\
 //	QMD_TAILQ_CHECK_NEXT(listelm, field);				\
@@ -607,7 +603,6 @@ func TAILQ_INIT(interface{}) {}
 //	QMD_TRACE_HEAD(head);						\
 //	QMD_TRACE_ELEM(&(elm)->field);					\
 //} while (0)
-func TAILQ_INSERT_TAIL(interface{}, interface{}, interface{}) {}
 //
 //#define	TAILQ_LAST(head, headname)					\
 //	(*(((struct headname *)((head)->tqh_last))->tqh_last))
@@ -634,7 +629,6 @@ func TAILQ_INSERT_TAIL(interface{}, interface{}, interface{}) {}
 //	TRASHIT(*oldprev);						\
 //	QMD_TRACE_ELEM(&(elm)->field);					\
 //} while (0)
-func TAILQ_REMOVE(interface{}, interface{}, interface{}) {}
 //
 //#define TAILQ_SWAP(head1, head2, type, field) do {			\
 //	struct type *swap_first = (head1)->tqh_first;			\

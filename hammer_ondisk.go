@@ -421,7 +421,9 @@ package hammer
 //hammer_volume_t
 //hammer_get_root_volume(struct hammer_mount *hmp, int *errorp)
 //{
+func hammer_get_root_volume(hmp *hammer_mount, errorp *int) hammer_volume_t {
 //	hammer_volume_t volume;
+	var volume hammer_volume_t
 //
 //	volume = hmp->rootvol;
 //	KKASSERT(volume != NULL);
@@ -439,7 +441,9 @@ package hammer
 //		*errorp = 0;
 //	}
 //	return (volume);
+	return volume
 //}
+}
 //
 ///*
 // * Load a volume's on-disk information.  The volume must be referenced and
@@ -474,6 +478,7 @@ package hammer
 //void
 //hammer_rel_volume(hammer_volume_t volume, int locked)
 //{
+func hammer_rel_volume(volume hammer_volume_t, locked int) {
 //	struct buf *bp;
 //
 //	if (hammer_rel_interlock(&volume->io.lock, locked)) {
@@ -484,6 +489,7 @@ package hammer
 //			brelse(bp);
 //	}
 //}
+}
 //
 //int
 //hammer_mountcheck_volumes(struct hammer_mount *hmp)
@@ -1273,9 +1279,11 @@ func hammer_get_node(trans hammer_transaction_t, node_offset hammer_off_t,
 //void
 //hammer_ref_node(hammer_node_t node)
 //{
+func hammer_ref_node(node hammer_node_t) {
 //	KKASSERT(hammer_isactive(&node->lock) && node->ondisk != NULL);
 //	hammer_ref(&node->lock);
 //}
+}
 //
 ///*
 // * Load a node's on-disk data reference.  Called with the node referenced
@@ -1407,6 +1415,7 @@ func hammer_get_node(trans hammer_transaction_t, node_offset hammer_off_t,
 //void
 //_hammer_rel_node(hammer_node_t node, int locked)
 //{
+func hammer_rel_node_two_args(node hammer_node_t, locked int) {
 //	hammer_buffer_t buffer;
 //
 //	/*
@@ -1467,12 +1476,15 @@ func hammer_get_node(trans hammer_transaction_t, node_offset hammer_off_t,
 //	}
 //	hammer_rel_buffer(buffer, 0);
 //}
+}
 //
 //void
 //hammer_rel_node(hammer_node_t node)
 //{
+func hammer_rel_node_one_arg(node hammer_node_t) {
 //	_hammer_rel_node(node, 0);
 //}
+}
 //
 ///*
 // * Free space on-media associated with a B-Tree node.
@@ -1480,10 +1492,12 @@ func hammer_get_node(trans hammer_transaction_t, node_offset hammer_off_t,
 //void
 //hammer_delete_node(hammer_transaction_t trans, hammer_node_t node)
 //{
+func hammer_delete_node(trans hammer_transaction_t, node hammer_node_t) {
 //	KKASSERT((node->flags & HAMMER_NODE_DELETED) == 0);
 //	node->flags |= HAMMER_NODE_DELETED;
 //	hammer_blockmap_free(trans, node->node_offset, sizeof(*node->ondisk));
 //}
+}
 //
 ///*
 // * Passively cache a referenced hammer_node.  The caller may release
@@ -1536,6 +1550,7 @@ func hammer_get_node(trans hammer_transaction_t, node_offset hammer_off_t,
 //void
 //hammer_flush_node(hammer_node_t node, int locked)
 //{
+func hammer_flush_node(node hammer_node_t, locked int) {
 //	hammer_node_cache_t cache;
 //	hammer_buffer_t buffer;
 //	hammer_mount_t hmp = node->hmp;
@@ -1578,6 +1593,7 @@ func hammer_get_node(trans hammer_transaction_t, node_offset hammer_off_t,
 //		kfree(node, hmp->m_misc);
 //	}
 //}
+}
 //
 ///*
 // * Flush passively cached B-Tree nodes associated with this buffer.
@@ -1620,8 +1636,10 @@ func hammer_get_node(trans hammer_transaction_t, node_offset hammer_off_t,
 //hammer_node_t
 //hammer_alloc_btree(hammer_transaction_t trans, hammer_off_t hint, int *errorp)
 //{
+func hammer_alloc_btree(trans hammer_transaction_t, hint hammer_off_t, errorp *int ) hammer_node_t {
 //	hammer_buffer_t buffer = NULL;
 //	hammer_node_t node = NULL;
+	var node hammer_node_t = nil;
 //	hammer_off_t node_offset;
 //
 //	node_offset = hammer_blockmap_alloc(trans, HAMMER_ZONE_BTREE_INDEX,
@@ -1636,7 +1654,9 @@ func hammer_get_node(trans hammer_transaction_t, node_offset hammer_off_t,
 //	if (buffer)
 //		hammer_rel_buffer(buffer, 0);
 //	return(node);
+	return node
 //}
+}
 //
 ///*
 // * Allocate data.  If the address of a data buffer is supplied then
