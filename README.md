@@ -1,29 +1,26 @@
 HAMMER
 ======
 
-This repository contains a yet as incomplete attempt to translate the [HAMMER file system][1] and necessary dependencies to the [Go programming language][2].
+This repository contains an attempt at porting [a Go translation][1] of [HAMMER file system][2] to [go-fuse][3].
 
 Status
 ------
 
-**Rough Translation Complete**
+**Under Development**
 
- - hammer.go
- - hammer_btree.go
-
-**Translation Underway**
-
- - hammer_vfsops.go
+ - main.go
+ - main_test.go
 
 Setup
 -----
 
- 1. [Install and configure Go][3]
+ 1. [Install and configure Go][4]
  2. export GOPATH=$HOME/go
  3. go get -d github.com/varialus/hammer
  4. cd ~/go/src/github.com/varialus/hammer/
  5. go test
 
-[1]:http://en.wikipedia.org/wiki/HAMMER
-[2]:http://en.wikipedia.org/wiki/Go_%28programming_language%29
-[3]:http://golang.org/doc/install
+[1]:https://github.com/varialus/bsd
+[2]:http://en.wikipedia.org/wiki/HAMMER
+[3]:https://github.com/hanwen/go-fuse
+[4]:http://golang.org/doc/install
