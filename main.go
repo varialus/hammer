@@ -1,13 +1,16 @@
 package main
 
-//import (
+import (
 //	"flag"
 //	"log"
 //
 //	"github.com/hanwen/go-fuse/fuse"
 //	"github.com/hanwen/go-fuse/fuse/nodefs"
 //	"github.com/hanwen/go-fuse/fuse/pathfs"
-//)
+	"github.com/varialus/bsd/sys/sys"
+	"github.com/varialus/bsd/sys/vfs/hammer"
+	"github.com/varialus/bsd/sys/vfs/hammer2"
+)
 //
 type HammerFs struct {
 //	pathfs.FileSystem
@@ -18,9 +21,8 @@ type Hammer2Fs struct {
 }
 //
 //func (me *HammerFs) GetAttr(name string, context *fuse.Context) (*fuse.Attr, fuse.Status) {
-func (me *HammerFs) GetAttr() {
-//	vop_getattr_args = new(hammer_something.Vop_getattr_args)
-//	hammer_vnops.Hammer_vop_getattr(vop_getattr_args)
+func (me *HammerFs) GetAttr(vop_getattr_args *sys.Vop_getattr_args) int {
+	result := hammer.Hammer_vop_getattr(vop_getattr_args)
 //	switch name {
 //	case "file.txt":
 //		return &fuse.Attr{
@@ -32,10 +34,12 @@ func (me *HammerFs) GetAttr() {
 //		}, fuse.OK
 //	}
 //	return nil, fuse.ENOENT
+	return result
 }
 //
 //func (me *Hammer2Fs) GetAttr(name string, context *fuse.Context) (*fuse.Attr, fuse.Status) {
-func (me *Hammer2Fs) GetAttr() {
+func (me *Hammer2Fs) GetAttr(vop_getattr_args *sys.Vop_getattr_args) int {
+	result := hammer2.Hammer2_vop_getattr(vop_getattr_args)
 //	vop_getattr_args = new(hammer_something.Vop_getattr_args)
 //	hammer2_vnops.Hammer2_vop_getattr(vop_getattr_args)
 //	switch name {
@@ -49,6 +53,7 @@ func (me *Hammer2Fs) GetAttr() {
 //		}, fuse.OK
 //	}
 //	return nil, fuse.ENOENT
+	return result
 }
 //
 //func (me *HelloFs) OpenDir(name string, context *fuse.Context) (c []fuse.DirEntry, code fuse.Status) {

@@ -11,6 +11,7 @@ THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH RE
 package main
 
 import (
+	"github.com/varialus/bsd/sys/sys"
 	"testing"
 )
 
@@ -26,11 +27,14 @@ func TestMain(t *testing.T) {
 // Smoke Test
 // Letter after Test has to be a capital regardless of whether the function exported or not.
 func TestGetAttr(t *testing.T) {
+	args := new(sys.Vop_getattr_args)
+	args.A_vp = new(sys.Vnode)
 	hammer_fs := new(HammerFs)
 	hammer2_fs := new(Hammer2Fs)
-	hammer_fs.GetAttr()
-	hammer2_fs.GetAttr()
-	if false {
-		t.Errorf("Failed dummy test TestGetAttr()")
+	if result := hammer_fs.GetAttr(args); result != 0 {
+		t.Errorf("Failed TestGetAttr()")
+	}
+	if result := hammer2_fs.GetAttr(args); result != 0 {
+		t.Errorf("Failed TestGetAttr()")
 	}
 }
