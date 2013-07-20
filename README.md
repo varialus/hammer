@@ -8,8 +8,8 @@ Status
 
 **Under Development**
 
- - main.go
- - main_test.go
+ - raw/main.go
+ - raw/main_test.go
 
 Setup
 -----
@@ -18,7 +18,7 @@ Setup
  2. export GOPATH=$HOME/go
  3. go get -d github.com/varialus/hammer
  4. cd ~/go/src/github.com/varialus/hammer/
- 5. go test
+ 5. go test ./...
 
 [1]:https://github.com/varialus/bsd
 [2]:http://en.wikipedia.org/wiki/HAMMER
