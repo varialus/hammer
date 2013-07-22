@@ -1,7 +1,7 @@
 HAMMER
 ======
 
-This repository contains an attempt at porting [a Go translation][1] of [HAMMER file system][2] to [go-fuse][3].
+This repository contains an attempt at porting [a Go translation][1] of [HAMMER file system][2] to [FUSE][3].
 
 Status
 ------
@@ -21,5 +21,5 @@ Setup
 
 [1]:https://github.com/varialus/bsd
 [2]:http://en.wikipedia.org/wiki/HAMMER
-[3]:https://github.com/hanwen/go-fuse
+[3]:https://en.wikipedia.org/wiki/Filesystem_in_Userspace
 [4]:http://golang.org/doc/install
